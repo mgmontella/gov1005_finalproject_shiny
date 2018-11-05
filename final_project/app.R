@@ -8,7 +8,7 @@
 #
 
 #library(readxl)
-#library(tidyverse)
+library(tidyverse)
 #library(janitor)
 library(readr)
 #library(stringr)
@@ -46,7 +46,7 @@ server <- function(input, output) {
    
    output$distPlot <- renderPlot({
       # generate bins based on input$bins from ui.R
-      ggplot(data, aes(x = Year, y = USD)) + geom_point()
+      ggplot(data, aes(x = Year, y = USD)) + geom_point() + ylab("Millions of USD")
    })
 }
 

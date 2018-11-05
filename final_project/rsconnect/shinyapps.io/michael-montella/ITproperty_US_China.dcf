@@ -5,9 +5,8 @@ account: michael-montella
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 554263
-bundleId: 1684063
+bundleId: 1684126
 url: https://michael-montella.shinyapps.io/ITproperty_US_China/
-when: 1541457577.70524
+when: 1541460165.92324
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: intelexports.rds

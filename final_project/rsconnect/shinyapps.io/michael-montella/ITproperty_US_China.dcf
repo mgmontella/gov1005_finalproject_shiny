@@ -1,0 +1,13 @@
+name: ITproperty_US_China
+title: ITproperty_US_China
+username:
+account: michael-montella
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 554263
+bundleId: 1684063
+url: https://michael-montella.shinyapps.io/ITproperty_US_China/
+when: 1541457577.70524
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: intelexports.rds

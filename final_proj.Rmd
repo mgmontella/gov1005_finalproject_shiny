@@ -1,0 +1,243 @@
+---
+title: "final_proj"
+author: "Michael Montella"
+date: "11/3/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(tidyverse)
+library(janitor)
+library(readr)
+library(stringr)
+library(fs)
+library(splitstackshape)
+library(shiny)
+```
+
+```{r, message = FALSE, cache = TRUE}
+
+#cache = TRUE saves output of a code chunk so we don't need to redownload files each time we execute code chunk
+
+download.file(url = "https://www.wto.org/english/res_e/statis_e/daily_update_e/services_annual_dataset.zip", destfile = "services_annual_dataset.zip")
+
+unzip("services_annual_dataset.zip")
+
+annual <- read_delim("services_annual_dataset.csv", delim = "|", col_names = FALSE, escape_double = FALSE)
+
+file_delete(c("services_annual_dataset.zip", "services_annual_dataset.csv"))
+```
+
+
+```{r}
+annual_split <- cSplit(annual, "X1", ",") 
+
+#US "cost" of charges for the use of intellectual property from China
+US_Intelprop_imports <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America" & X1_06 == "Charges for the use of intellectual property n.i.e." & X1_08 == "Imports") %>%
+  select(X1_09, X1_11) %>%
+  rename("Year" = X1_09, "Millions of USD" = X1_11)
+
+#US "income" from charges for the use of intellectual property to China
+US_Intelprop_exports <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America" & X1_06 == "Charges for the use of intellectual property n.i.e." & X1_08 == "Exports") %>%
+  select(X1_09, X1_11) %>%
+  rename("Year" = X1_09, "USD" = X1_11)
+
+US_C_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Services")
+
+US_C_Maintenance <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Maintenance and repair services n.i.e.")
+
+US_C_Other_Air <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Other (Air)")
+
+US_C_Freight_Air <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Freight (Air)")
+
+US_C_Fin_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Financial services")
+
+US_C_Travel <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Travel")
+
+US_C_Education_related <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Education-related")
+
+US_C_Construction <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Construction")
+
+US_C_Tele_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Telecommunications services")
+
+US_C_Comp_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Computer services")
+
+US_C_Info_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Information services")
+
+US_C_RD_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Research and development services")
+
+US_C_Prof_Cons_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Professional and management consulting services")
+
+US_C_Comm_Services <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Commercial services")
+
+US_C_Other_Comm_Serv <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Other commercial services")
+
+US_C_Other_Servs <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Other services")
+
+US_C_Other_leasing <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Operating leasing services")
+
+US_C_legal_servs <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Legal services")
+
+US_C_goods_related_servs <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Goods-related services")
+
+US_C_Gov_goods <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Government goods and services n.i.e.")
+```
+
+```{r}
+#ALL TRANSPORTATION 
+
+US_C_Transport <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Transport")
+
+US_C_Sea_transport <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Sea transport")
+
+US_C_Air <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Air transport")
+
+US_C_Passenger <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Passenger (Air)")
+
+US_C_Other_modes <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Other modes of transport")
+```
+
+```{r}
+#ALL INSURANCE
+
+US_C_Insurance_Pension <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Insurance and pension services")
+
+US_C_direct_insurance <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Direct insurance")
+
+US_C_Reinsurance <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Reinsurance")
+```
+
+```{r}
+#ALL LICENCING
+
+US_C_Licences_research_dev <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Licences for the use of outcomes of research and development")
+
+US_C_Licences_compsoft <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Licences to reproduce and/or distribute computer software")
+
+US_C_Licences_other_products <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Licences to reproduce and/or distribute other products")
+
+US_C_Franchises_Trademarks <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Franchises and trademarks licensing fees")
+```
+
+
+
+```{r}
+#ALL NOT WORKING
+
+#doesn't work
+US_C_Advertising <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Advertising")
+
+#doesnt work
+US_C_Accounting <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Accounting")
+
+#doesn't work
+US_C_Architectural <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Architectural")
+
+#doesn't work
+US_C_Cons_PR <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Business and management consulting and public rel")
+
+#doesn't work
+US_C_Freight <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Freight (Sea)")
+
+#doesnt work
+US_C_Legal <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Legal")
+
+#doesn't work
+US_C_Licences_audio_visual <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Licences to reproduce and/or distribute audio-visual")
+
+#doesn't work
+US_C_Other_Sea <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Other (Sea)")
+
+#telecommunications not working
+US_C_Telecommunications <- annual_split %>% 
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  filter(X1_06 == "Telecommunications")
+```
+
+
+
+

@@ -8,14 +8,20 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
-library(tidyverse)
 library(janitor)
 library(readr)
 library(stringr)
 library(fs)
 library(splitstackshape)
 library(shiny)
+library(kableExtra)
+library(dplyr)
+library(formattable)
+library(lubridate)
+library(plotly)
+library(tidyverse)
 ```
+
 
 ```{r, message = FALSE, cache = TRUE}
 
@@ -31,9 +37,43 @@ file_delete(c("services_annual_dataset.zip", "services_annual_dataset.csv"))
 ```
 
 
+```{r, message = FALSE, cache = TRUE}
+#cache = TRUE saves output of a code chunk so we don't need to redownload files each time we execute code chunk
+
+US_to_China <- read_excel("US_exportstoChina.xlsx")
+```
+
+
+
 ```{r}
 annual_split <- cSplit(annual, "X1", ",") 
 
+#services_Wto is the data frame I need to work with for the first part of the shiny app. From this data frame, users will be able to select the year and the service description, which will then display a bar graph of imports/exports for the selection. Millions of USD would be the y-axis variable, and X1_08 (Flow direction) would be the y-axis variable. 
+services_Wto <- annual_split %>%
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  select(X1_02, X1_04, X1_06, X1_08, X1_09, X1_11) %>%
+  rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09, "Millions of USD" = X1_11)
+
+#a second data frame will be needed for the second part of the shiny app. This app will be a line graph with year on the x-axis and millions of USD on the y-axis, with two lines representing either import or export. Users will select the type of service they want to see the distinction for.
+services_Wto <- annual_split %>%
+  filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+  select(X1_02, X1_04, X1_06, X1_08, X1_09, X1_11) %>%
+  rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09)
+
+test <- services_Wto %>%
+  filter(X1_06 == "Services")
+ggplot(data = test, aes(x = Year, y = X1_11, color = X1_08)) + geom_line()
+
+services_imports <- services_Wto %>%
+  filter(X1_08 == "Imports") 
+
+write_rds(services_imports, "services_imports.rds")
+
+services_exports <- services_Wto %>%
+  filter(X1_08 == "Exports")
+```
+
+```{r}
 #US "cost" of charges for the use of intellectual property from China
 US_Intelprop_imports <- annual_split %>% 
   filter(X1_04 == "China" & X1_02 == "United States of America" & X1_06 == "Charges for the use of intellectual property n.i.e." & X1_08 == "Imports") %>%

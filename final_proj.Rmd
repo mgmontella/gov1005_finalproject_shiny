@@ -74,7 +74,7 @@ services_Wto <- annual_split %>%
 # https://stackoverflow.com/questions/30916137/why-is-my-graphs-y-axis-not-in-the-right-order
 services_Wto$X1_11 <- as.numeric(as.character(services_Wto$X1_11))
 # test is a mock ggplot that is the skeleton for the later shiny app
-write_rds(services_Wto$X1_11, "services.rds")
+write_rds(services_Wto, "services.rds")
 
 
 # This is a ggplot for what I am looking for:

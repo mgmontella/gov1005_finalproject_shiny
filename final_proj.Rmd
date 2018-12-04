@@ -67,12 +67,12 @@ services_Wto <- annual_split %>%
 # X1_09 tells us the year 
 # X1_11 tells us the amount of the transaction in millions of USD
   select(X1_02, X1_04, X1_06, X1_08, X1_09, X1_11) %>%
-  rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09) %>%
+  rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09, "Value" = X1_11) %>%
   filter(Year != "M", Year != "X") %>%
   filter(X1_08 == "Imports" | X1_08 == "Exports")
 # the X1_11 (Millions of USD) variable was a character variable and needed to be changed to a numeric variable; as a # character variable, the y-axis in the ggplot was displaying out of ascending order
 # https://stackoverflow.com/questions/30916137/why-is-my-graphs-y-axis-not-in-the-right-order
-services_Wto$X1_11 <- as.numeric(as.character(services_Wto$X1_11))
+services_Wto$Value <- as.numeric(as.character(services_Wto$Value))
 # test is a mock ggplot that is the skeleton for the later shiny app
 write_rds(services_Wto, "services.rds")
 

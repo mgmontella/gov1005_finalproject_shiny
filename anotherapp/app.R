@@ -25,6 +25,9 @@ ui <- fluidPage(
   # Application title
   titlePanel("US-China Exchange of Services"),
   
+  tabsetPanel(
+    tabPanel("US-China Services Exchange since 2005", fluid = TRUE,
+  
   # Sidebar with a slider input for  
   sidebarLayout(
     sidebarPanel(
@@ -64,10 +67,19 @@ ui <- fluidPage(
                   selected = "All Services",
                   multiple = FALSE)),
 # Show a plot of the generated distribution
-  mainPanel(plotlyOutput("lineplot"))))
+  mainPanel(
+    tabsetPanel(type = "tabs",
+                tabPanel("My Plot", textOutput("text"),
+                tabPanel("lineplot", plotlyOutput("lineplot"))
+                )))))))
+    
 
 # Define server logic required to draw a histogram
 server <- function(input, output) { 
+  
+  output$text <- renderText({
+    "This data is collected from the World Trade Organization and observes trends in the exchange of services between the United States and China since 2005."
+  })
   
   output$lineplot <- renderPlotly({
     

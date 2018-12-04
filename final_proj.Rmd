@@ -54,23 +54,35 @@ services_Wto <- annual_split %>%
   select(X1_02, X1_04, X1_06, X1_08, X1_09, X1_11) %>%
   rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09, "Millions of USD" = X1_11)
 
-#a second data frame will be needed for the second part of the shiny app. This app will be a line graph with year on the x-axis and millions of USD on the y-axis, with two lines representing either import or export. Users will select the type of service they want to see the distinction for.
+ggplot()
+
+write_rds(services_Wto, "services_Wto.rds")
+
+# A second data frame will be needed for the second part of the shiny app. This app will be a line graph with year  # on the x-axis and millions of USD on the y-axis, with two lines representing either import or export. Users will  # select the type of service they want to see the distinction for.
+
 services_Wto <- annual_split %>%
+# X1_04 represents the partner economy, which we want to be China. 
+# X1_02 represents the reporting economy, which we want to be the US
   filter(X1_04 == "China" & X1_02 == "United States of America") %>%
+# X1_06 provides the type of service, which is the selection users will later choose
+# X1_08 tells us whether the transaction was an import or export from the US' perspective
+# X1_09 tells us the year 
+# X1_11 tells us the amount of the transaction in millions of USD
   select(X1_02, X1_04, X1_06, X1_08, X1_09, X1_11) %>%
-  rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09)
-
+  rename("Reporting Economy" = X1_02, "Partner Economy" = X1_04, "Year" = X1_09) %>%
+  filter(Year != "M", Year != "X") %>%
+  filter(X1_08 == "Imports" | X1_08 == "Exports")
+# the X1_11 (Millions of USD) variable was a character variable and needed to be changed to a numeric variable; as a # character variable, the y-axis in the ggplot was displaying out of ascending order
+# https://stackoverflow.com/questions/30916137/why-is-my-graphs-y-axis-not-in-the-right-order
+services_Wto$X1_11 <- as.numeric(as.character(services_Wto$X1_11))
+# test is a mock ggplot that is the skeleton for the later shiny app
 test <- services_Wto %>%
-  filter(X1_06 == "Services")
-ggplot(data = test, aes(x = Year, y = X1_11, color = X1_08)) + geom_line()
-
-services_imports <- services_Wto %>%
-  filter(X1_08 == "Imports") 
-
-write_rds(services_imports, "services_imports.rds")
-
-services_exports <- services_Wto %>%
-  filter(X1_08 == "Exports")
+# we are filtering for X1_06 == "Services" to simulate a user selecting "Services"
+  filter(X1_06 == "Services") 
+# within the ggplot, the group = X1_08 aes connects points within that defined group. For this ggplot that means all # import values are connected and all export values are connected
+# the theme(legend.title...) phrase removes the legend title 
+# https://stackoverflow.com/questions/14771546/remove-legend-title-in-ggplot
+ggplot(data = test, aes(x = Year, y = X1_11, color = X1_08, group = X1_08)) + geom_point() + geom_line() + labs(title = "US-China Trade in Services over Time") + ylab("Millions of USD") + xlab("Year") + theme(text = element_text(family = "Times New Roman", size = 14), panel.background = element_blank()) + theme(legend.title=element_blank())
 ```
 
 ```{r}
